@@ -1,0 +1,34 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Função auxiliar para obter dados do usuário no Firestore
+    function getUserData() {
+      return firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data;
+    }
+    
+    // Função auxiliar para verificar se o usuário pertence à clínica
+    function isMemberOf(clinicId) {
+      return request.auth != null && getUserData().clinicId == clinicId;
+    }
+    
+    // Função auxiliar para verificar o papel do usuário
+    function hasRole(role) {
+      return request.auth != null && getUserData().role == role;
+    }
+
+    // Regras de acesso para logotipos das clínicas
+    match /clinics/{clinicId}/logo/{allPaths=**} {
+      // O logotipo precisa ser público para ser exibido em e-mails e na página pública do pet
+      allow read: if true;
+      // Apenas administradores da própria clínica podem alterar o logotipo
+      allow write: if isMemberOf(clinicId) && hasRole('admin');
+    }
+
+    // Regras de acesso para fotos e exames dos pets
+    match /clinics/{clinicId}/pets/{petId}/{allPaths=**} {
+      // Apenas membros autorizados da clínica podem ler ou gravar arquivos dos pets (fotos, PDFs de exames)
+      allow read, write: if isMemberOf(clinicId);
+    }
+  }
+}
