@@ -55,7 +55,7 @@ export async function openSoapRecordModal(petId, petName, editRecord = null) {
           <div class="soap-field">
             <h4 class="soap-s"><i data-lucide="help-circle"></i> S - Subjetivo</h4>
             <div class="input-wrapper">
-              <textarea id="soap-subjective" required placeholder="Anamnese, queixas do tutor, comportamento do pet, sintomas relatados...">${subjectiveVal}</textarea>
+              <textarea id="soap-subjective" required placeholder="Anamnese, queixas do paciente, sintomas relatados...">${subjectiveVal}</textarea>
             </div>
           </div>
 
@@ -63,7 +63,7 @@ export async function openSoapRecordModal(petId, petName, editRecord = null) {
           <div class="soap-field">
             <h4 class="soap-o"><i data-lucide="activity"></i> O - Objetivo</h4>
             <div class="input-wrapper">
-              <textarea id="soap-objective" placeholder="Sinais vitais (peso, temperatura, batimentos, mucosas), achados no exame físico geral e específico...">${objectiveVal}</textarea>
+              <textarea id="soap-objective" placeholder="Sinais vitais (peso, temperatura, pressão, batimentos), achados no exame físico geral e específico...">${objectiveVal}</textarea>
             </div>
           </div>
 
@@ -71,7 +71,7 @@ export async function openSoapRecordModal(petId, petName, editRecord = null) {
           <div class="soap-field">
             <h4 class="soap-a"><i data-lucide="brain"></i> A - Análise</h4>
             <div class="input-wrapper">
-              <textarea id="soap-analysis" placeholder="Suspeitas clínicas, diagnósticos diferenciais, estado geral do pet...">${analysisVal}</textarea>
+              <textarea id="soap-analysis" placeholder="Suspeitas clínicas, diagnósticos diferenciais, estado geral do paciente...">${analysisVal}</textarea>
             </div>
           </div>
 
@@ -327,7 +327,7 @@ export function renderRecords(container) {
       <div style="margin: 24px 0 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
         <div class="input-wrapper" style="max-width: 400px; flex: 1;">
           <i data-lucide="search" class="input-icon"></i>
-          <input type="text" id="rec-search" placeholder="Buscar prontuário por pet, tutor ou sintoma...">
+          <input type="text" id="rec-search" placeholder="Buscar prontuário por paciente ou sintoma...">
         </div>
       </div>
 
@@ -379,17 +379,14 @@ function handleFilter() {
 
   const filtered = recordsList.filter(rec => {
     const pet = petsList.find(p => p.id === rec.petId);
-    const owner = pet ? clientsList.find(c => c.id === pet.clientId) : null;
     
     const petName = pet ? pet.name.toLowerCase() : "";
-    const breed = pet ? pet.breed.toLowerCase() : "";
-    const ownerName = owner ? owner.name.toLowerCase() : "";
+    const cpf = pet ? (pet.cpf || "").toLowerCase() : "";
     const subj = rec.soap.subjective.toLowerCase();
     const plan = rec.soap.plan.toLowerCase();
     
     return petName.includes(query) || 
-           ownerName.includes(query) || 
-           breed.includes(query) ||
+           cpf.includes(query) || 
            subj.includes(query) || 
            plan.includes(query);
   });
@@ -420,8 +417,7 @@ function renderRecordsList(items = recordsList) {
         <thead>
           <tr>
             <th>Data</th>
-            <th>Animal / Pet</th>
-            <th>Tutor</th>
+            <th>Paciente</th>
             <th>Diagnóstico / Queixa (Resumo)</th>
             <th>Medicamentos</th>
             <th class="text-right">Ações</th>
@@ -432,8 +428,7 @@ function renderRecordsList(items = recordsList) {
 
   items.forEach(rec => {
     const pet = petsList.find(p => p.id === rec.petId);
-    const owner = pet ? clientsList.find(c => c.id === pet.clientId) : null;
-    const petPhoto = pet && pet.photoUrl ? pet.photoUrl : "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=200";
+    const petPhoto = pet && pet.photoUrl ? pet.photoUrl : "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200";
 
     const medsText = rec.usedItems && rec.usedItems.length > 0 
       ? rec.usedItems.map(m => `<span class="status-badge status-badge-success" style="font-size: 10px; margin: 2px;">${m.name} (${m.quantity})</span>`).join(' ')
@@ -450,14 +445,13 @@ function renderRecordsList(items = recordsList) {
         <td>${formatDate(rec.date)}</td>
         <td>
           <div style="display: flex; align-items: center; gap: 10px;">
-            <img src="${petPhoto}" alt="${pet ? pet.name : 'Pet'}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
+            <img src="${petPhoto}" alt="${pet ? pet.name : 'Paciente'}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
             <div>
               <strong>${pet ? pet.name : 'Desconhecido'}</strong>
-              <div style="font-size: 11px; color: var(--color-gray-400);">${pet ? pet.species : ''}</div>
+              <div style="font-size: 11px; color: var(--color-gray-400);">${pet && pet.gender ? pet.gender : ''}</div>
             </div>
           </div>
         </td>
-        <td>${owner ? owner.name : 'N/A'}</td>
         <td>
           <div style="max-width: 280px; font-size: 13px; line-height: 1.4;">
             ${summary}
@@ -470,7 +464,7 @@ function renderRecordsList(items = recordsList) {
         </td>
         <td class="text-right">
           <div style="display: inline-flex; gap: 6px;">
-            <button class="btn btn-ghost btn-icon btn-view-rec" data-id="${rec.id}" title="Visualizar ProntuárioCompleto" style="width: 32px; height: 32px;">
+            <button class="btn btn-ghost btn-icon btn-view-rec" data-id="${rec.id}" title="Visualizar Prontuário Completo" style="width: 32px; height: 32px;">
               <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
             </button>
             <button class="btn btn-ghost btn-icon btn-edit-rec" data-id="${rec.id}" title="Editar Prontuário" style="width: 32px; height: 32px;">
@@ -512,7 +506,7 @@ function renderRecordsList(items = recordsList) {
       const recId = btn.getAttribute("data-id");
       const rec = items.find(r => r.id === recId);
       const pet = petsList.find(p => p.id === rec.petId);
-      const petName = pet ? pet.name : "o animal";
+      const petName = pet ? pet.name : "o paciente";
       
       if (confirm(`Tem certeza de que deseja excluir o prontuário de ${petName} em ${formatDate(rec.date)}? Isso irá estornar os estoques utilizados e apagar os respectivos lançamentos financeiros.`)) {
         try {
@@ -548,7 +542,7 @@ function openViewRecordModalDirectly(record) {
   const modalHTML = `
     <div style="text-align: left; font-size: 14px; line-height: 1.6; display: flex; flex-direction: column; gap: 16px;">
       <p style="font-size: 13px; color: var(--color-gray-500); margin-bottom: 0;">
-        Consulta de <strong>${pet ? pet.name : 'Pet'}</strong> realizada em <strong>${formatDate(record.date)}</strong>
+        Consulta de <strong>${pet ? pet.name : 'Paciente'}</strong> realizada em <strong>${formatDate(record.date)}</strong>
       </p>
       
       <div style="background: var(--color-gray-50); padding: 12px; border-radius: var(--radius-md); border-left: 4px solid var(--brand-primary);">

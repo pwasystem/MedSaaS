@@ -125,7 +125,7 @@ export async function initDashboard() {
     });
     document.getElementById("dash-metric-stock").textContent = criticalStockItems.length;
 
-    // 5. Calcular Pets com Vacinas Vencidas
+    // 5. Calcular Pacientes com Vacinas Vencidas
     let expiredVaccinesCount = 0;
     const now = new Date();
     
@@ -173,7 +173,7 @@ function renderAlerts(criticalStock, pets, now) {
     });
   });
 
-  // Alertas de vacinas vencidas nos pets
+  // Alertas de vacinas vencidas nos pacientes
   pets.forEach(pet => {
     if (pet.vaccines && Array.isArray(pet.vaccines)) {
       pet.vaccines.forEach(vac => {
@@ -184,7 +184,7 @@ function renderAlerts(criticalStock, pets, now) {
             alerts.push({
               type: "warning",
               icon: "shield-alert",
-              message: `Vacina <strong>${vac.name}</strong> do pet <strong>${pet.name}</strong> vencida há ${diffDays} dias.`
+              message: `Vacina <strong>${vac.name}</strong> do paciente <strong>${pet.name}</strong> vencida há ${diffDays} dias.`
             });
           }
         }

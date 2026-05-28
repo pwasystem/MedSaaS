@@ -211,15 +211,15 @@
     <div id="error-screen" class="error-container" style="display: none;">
       <i data-lucide="alert-octagon"></i>
       <h3 style="font-size: 18px; margin-bottom: 8px;">Carteirinha não encontrada</h3>
-      <p style="color: var(--color-gray-500); font-size: 14px;">Os dados deste pet podem ter sido arquivados ou o QR Code é inválido.</p>
+      <p style="color: var(--color-gray-500); font-size: 14px;">Os dados deste paciente podem ter sido arquivados ou o QR Code é inválido.</p>
     </div>
 
     <!-- Interface Renderizada Dinamicamente -->
     <div id="card-screen" style="display: none;">
       <div class="header-card">
-        <img id="pet-img" src="" alt="Avatar do Pet" class="pet-avatar">
-        <h2 id="pet-name" class="pet-name">Rex</h2>
-        <span id="pet-info-badge" class="pet-badge">Cão • Labrador</span>
+        <img id="pet-img" src="" alt="Avatar do Paciente" class="pet-avatar">
+        <h2 id="pet-name" class="pet-name">Paciente</h2>
+        <span id="pet-info-badge" class="pet-badge">Gênero • CPF</span>
       </div>
 
       <div class="content-body">
@@ -293,11 +293,11 @@
     }
 
     function renderCard(data) {
-      document.getElementById("pet-name").textContent = data.petName || "Sem Nome";
-      document.getElementById("pet-info-badge").textContent = `${data.species || 'Animal'} • ${data.breed || 'SRD'}`;
+      document.getElementById("pet-name").textContent = data.patientName || data.petName || "Sem Nome";
+      document.getElementById("pet-info-badge").textContent = `${data.gender || 'Não Informado'} • CPF: ${data.cpf || 'Não Informado'}`;
       
       const img = document.getElementById("pet-img");
-      img.src = data.photoUrl || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=200";
+      img.src = data.photoUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200";
 
       const vacContainer = document.getElementById("vaccines-container");
       vacContainer.innerHTML = "";

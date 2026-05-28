@@ -75,9 +75,8 @@ export function renderAppointmentsView(container) {
             <thead>
               <tr>
                 <th>Data e Hora</th>
-                <th>Pet (Paciente)</th>
-                <th>Tutor (Responsável)</th>
-                <th>Veterinário</th>
+                <th>Paciente</th>
+                <th>Médico / Profissional</th>
                 <th>Descrição / Sintomas</th>
                 <th>Status</th>
                 <th class="text-right">Ações</th>
@@ -85,7 +84,7 @@ export function renderAppointmentsView(container) {
             </thead>
             <tbody id="appointments-list-body">
               <tr>
-                <td colspan="7" class="text-center" style="padding: 40px; color: var(--color-gray-400);">
+                <td colspan="6" class="text-center" style="padding: 40px; color: var(--color-gray-400);">
                   <i data-lucide="loader" class="animate-spin" style="width: 24px; height: 24px; margin-bottom: 8px;"></i>
                   <p>Carregando agenda...</p>
                 </td>
@@ -172,7 +171,7 @@ function renderAppointmentsTable(list = appointmentsList) {
   if (list.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="7" class="text-center" style="padding: 40px; color: var(--color-gray-400);">
+        <td colspan="6" class="text-center" style="padding: 40px; color: var(--color-gray-400);">
           <i data-lucide="calendar" style="width: 24px; height: 24px; margin-bottom: 8px;"></i>
           <p>Nenhuma consulta agendada.</p>
         </td>
@@ -205,7 +204,6 @@ function renderAppointmentsTable(list = appointmentsList) {
       <tr style="${isCancelled ? 'opacity: 0.6; background-color: var(--color-gray-50);' : ''}">
         <td style="font-weight: 600;">${dateFormatted}</td>
         <td><strong>${escapeHTML(apt.petName)}</strong></td>
-        <td>${escapeHTML(apt.clientName)}</td>
         <td>${escapeHTML(apt.vetName)}</td>
         <td style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
           ${escapeHTML(apt.description || 'N/A')}
@@ -221,7 +219,7 @@ function renderAppointmentsTable(list = appointmentsList) {
                 <i data-lucide="x-circle" style="width: 16px; height: 16px;"></i>
               </button>
             ` : ''}
-            <button class="btn btn-ghost btn-icon btn-view-pet-record" data-petid="${apt.petId}" title="Ver Prontuário do Pet" style="width: 32px; height: 32px; color: var(--brand-primary);">
+            <button class="btn btn-ghost btn-icon btn-view-pet-record" data-petid="${apt.petId}" title="Ver Prontuário" style="width: 32px; height: 32px; color: var(--brand-primary);">
               <i data-lucide="stethoscope" style="width: 16px; height: 16px;"></i>
             </button>
             <button class="btn btn-ghost btn-icon btn-edit-apt" data-id="${apt.id}" title="Editar Consulta" style="width: 32px; height: 32px;">
@@ -283,14 +281,14 @@ function bindTableActions() {
     };
   });
 
-  // Abrir prontuário do pet
+  // Abrir prontuário do paciente
   document.querySelectorAll(".btn-view-pet-record").forEach(btn => {
     btn.onclick = (e) => {
       const petId = e.currentTarget.getAttribute("data-petid");
       if (petId) {
         showPetDetails(petId);
       } else {
-        showToast("Pet não encontrado para este agendamento.", "warning");
+        showToast("Paciente não encontrado para este agendamento.", "warning");
       }
     };
   });
@@ -314,23 +312,21 @@ function filterAppointments() {
  */
 function openNewAppointmentModal() {
   if (petsList.length === 0) {
-    showToast("É necessário ter pelo menos um pet cadastrado antes de agendar.", "warning");
+    showToast("É necessário ter pelo menos um paciente cadastrado antes de agendar.", "warning");
     return;
   }
 
-  let petOptions = `<option value="" disabled selected>Selecione o pet...</option>`;
+  let petOptions = `<option value="" disabled selected>Selecione o paciente...</option>`;
   petsList.forEach(pet => {
-    const owner = clientsList.find(c => c.id === pet.clientId);
-    const ownerName = owner ? owner.name : "Desconhecido";
-    petOptions += `<option value="${pet.id}" data-petname="${pet.name}" data-ownername="${ownerName}">${pet.name} (Tutor: ${ownerName})</option>`;
+    petOptions += `<option value="${pet.id}" data-petname="${pet.name}">${pet.name} (CPF: ${pet.cpf || 'Não Informado'})</option>`;
   });
 
   showModal("Novo Agendamento", `
     <form id="form-modal-new-apt">
       <div class="form-group">
-        <label for="na-pet">Paciente (Pet)</label>
+        <label for="na-pet">Paciente</label>
         <div class="input-wrapper">
-          <i data-lucide="paw-print" class="input-icon"></i>
+          <i data-lucide="user" class="input-icon"></i>
           <select id="na-pet" required>
             ${petOptions}
           </select>
@@ -338,10 +334,10 @@ function openNewAppointmentModal() {
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label for="na-vet">Médico Veterinário</label>
+          <label for="na-vet">Médico / Profissional</label>
           <div class="input-wrapper">
             <i data-lucide="stethoscope" class="input-icon"></i>
-            <input type="text" id="na-vet" required placeholder="Nome do Veterinário">
+            <input type="text" id="na-vet" required placeholder="Nome do Profissional">
           </div>
         </div>
         <div class="form-group">
@@ -356,7 +352,7 @@ function openNewAppointmentModal() {
         <label for="na-desc">Descrição do Procedimento / Sintomas</label>
         <div class="input-wrapper">
           <i data-lucide="file-text" class="input-icon"></i>
-          <textarea id="na-desc" placeholder="Ex: Vacinação de rotina V10, exames, consulta médica..."></textarea>
+          <textarea id="na-desc" placeholder="Ex: Consulta de rotina, exames, queixas..."></textarea>
         </div>
       </div>
       <button type="submit" class="btn btn-primary btn-block">Confirmar Agendamento</button>
@@ -373,7 +369,7 @@ function openNewAppointmentModal() {
     
     const petId = petSelect.value;
     const petName = selectedOption.getAttribute("data-petname");
-    const clientName = selectedOption.getAttribute("data-ownername");
+    const clientName = "";
     const vetName = document.getElementById("na-vet").value;
     const date = document.getElementById("na-date").value;
     const description = document.getElementById("na-desc").value;
@@ -410,17 +406,15 @@ function openEditAppointmentModal(aptId) {
 
   let petOptions = ``;
   petsList.forEach(pet => {
-    const owner = clientsList.find(c => c.id === pet.clientId);
-    const ownerName = owner ? owner.name : "Desconhecido";
-    petOptions += `<option value="${pet.id}" data-petname="${pet.name}" data-ownername="${ownerName}" ${pet.id === apt.petId ? 'selected' : ''}>${pet.name} (Tutor: ${ownerName})</option>`;
+    petOptions += `<option value="${pet.id}" data-petname="${pet.name}" ${pet.id === apt.petId ? 'selected' : ''}>${pet.name} (CPF: ${pet.cpf || 'Não Informado'})</option>`;
   });
 
   showModal("Editar Consulta", `
     <form id="form-modal-edit-apt">
       <div class="form-group">
-        <label for="ea-pet">Paciente (Pet)</label>
+        <label for="ea-pet">Paciente</label>
         <div class="input-wrapper">
-          <i data-lucide="paw-print" class="input-icon"></i>
+          <i data-lucide="user" class="input-icon"></i>
           <select id="ea-pet" required>
             ${petOptions}
           </select>
@@ -428,10 +422,10 @@ function openEditAppointmentModal(aptId) {
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label for="ea-vet">Médico Veterinário</label>
+          <label for="ea-vet">Médico / Profissional</label>
           <div class="input-wrapper">
             <i data-lucide="stethoscope" class="input-icon"></i>
-            <input type="text" id="ea-vet" required value="${escapeHTML(apt.vetName)}" placeholder="Nome do Veterinário">
+            <input type="text" id="ea-vet" required value="${escapeHTML(apt.vetName)}" placeholder="Nome do Profissional">
           </div>
         </div>
         <div class="form-group">
@@ -457,7 +451,7 @@ function openEditAppointmentModal(aptId) {
         <label for="ea-desc">Descrição do Procedimento / Sintomas</label>
         <div class="input-wrapper">
           <i data-lucide="file-text" class="input-icon"></i>
-          <textarea id="ea-desc" placeholder="Ex: Sintomas do pet...">${escapeHTML(apt.description || '')}</textarea>
+          <textarea id="ea-desc" placeholder="Ex: Sintomas do paciente...">${escapeHTML(apt.description || '')}</textarea>
         </div>
       </div>
       
@@ -478,7 +472,7 @@ function openEditAppointmentModal(aptId) {
     
     const petId = petSelect.value;
     const petName = selectedOption.getAttribute("data-petname");
-    const clientName = selectedOption.getAttribute("data-ownername");
+    const clientName = "";
     const vetName = document.getElementById("ea-vet").value;
     const date = document.getElementById("ea-date").value;
     const status = document.getElementById("ea-status").value;

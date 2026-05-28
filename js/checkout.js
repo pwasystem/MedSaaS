@@ -28,7 +28,7 @@ export function renderCheckout(container) {
       <div id="chk-filter-bar" style="margin: 24px 0 16px;">
         <div class="input-wrapper" style="max-width: 400px;">
           <i data-lucide="search" class="input-icon"></i>
-          <input type="text" id="chk-search" placeholder="Buscar atendimento por pet ou tutor...">
+          <input type="text" id="chk-search" placeholder="Buscar atendimento por paciente...">
         </div>
       </div>
 
@@ -108,12 +108,11 @@ function handleSearch(e) {
   const query = e.target.value.toLowerCase();
   const filtered = pendingRecords.filter(rec => {
     const pet = petsList.find(p => p.id === rec.petId);
-    const owner = pet ? clientsList.find(c => c.id === pet.clientId) : null;
     
     const petName = pet ? pet.name.toLowerCase() : "";
-    const ownerName = owner ? owner.name.toLowerCase() : "";
+    const cpf = pet ? (pet.cpf || "").toLowerCase() : "";
     
-    return petName.includes(query) || ownerName.includes(query);
+    return petName.includes(query) || cpf.includes(query);
   });
   renderPendingTable(filtered);
 }
@@ -141,8 +140,7 @@ function renderPendingTable(items = pendingRecords) {
         <thead>
           <tr>
             <th>Data</th>
-            <th>Animal / Pet</th>
-            <th>Tutor</th>
+            <th>Paciente</th>
             <th>Materiais Utilizados</th>
             <th class="text-right">Ação</th>
           </tr>
@@ -152,8 +150,7 @@ function renderPendingTable(items = pendingRecords) {
 
   items.forEach(rec => {
     const pet = petsList.find(p => p.id === rec.petId);
-    const owner = pet ? clientsList.find(c => c.id === pet.clientId) : null;
-    const petPhoto = pet && pet.photoUrl ? pet.photoUrl : "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=200";
+    const petPhoto = pet && pet.photoUrl ? pet.photoUrl : "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200";
 
     const medsText = rec.usedItems && rec.usedItems.length > 0
       ? rec.usedItems.map(m => `<span class="status-badge status-badge-success" style="font-size: 10px; margin: 2px;">${m.name} (${m.quantity})</span>`).join(' ')
@@ -164,14 +161,13 @@ function renderPendingTable(items = pendingRecords) {
         <td>${formatDate(rec.date)}</td>
         <td>
           <div style="display: flex; align-items: center; gap: 10px;">
-            <img src="${petPhoto}" alt="${pet ? pet.name : 'Pet'}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
+            <img src="${petPhoto}" alt="${pet ? pet.name : 'Paciente'}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
             <div>
               <strong>${pet ? pet.name : 'Desconhecido'}</strong>
-              <div style="font-size: 11px; color: var(--color-gray-400);">${pet ? pet.species : ''}</div>
+              <div style="font-size: 11px; color: var(--color-gray-400);">${pet && pet.gender ? pet.gender : ''}</div>
             </div>
           </div>
         </td>
-        <td>${owner ? owner.name : 'N/A'}</td>
         <td>
           <div style="max-width: 250px; display: flex; flex-wrap: wrap;">
             ${medsText}
@@ -205,7 +201,6 @@ function renderPendingTable(items = pendingRecords) {
 
 function openCheckoutModal(record) {
   const pet = petsList.find(p => p.id === record.petId);
-  const owner = pet ? clientsList.find(c => c.id === pet.clientId) : null;
 
   // Itens do estoque para seletor de adicionais
   let inventoryOptions = `<option value="" disabled selected>Adicionar outro item avulso...</option>`;
@@ -241,7 +236,7 @@ function openCheckoutModal(record) {
   const checkoutHTML = `
     <div style="text-align: left;">
       <h4 style="font-size: 14px; color: var(--color-gray-500); margin-bottom: 16px;">
-        Cobrança para: <strong>${pet ? pet.name : 'Pet'}</strong> (Tutor: ${owner ? owner.name : 'N/A'})
+        Cobrança para o paciente: <strong>${pet ? pet.name : 'Paciente'}</strong>
       </h4>
       
       <div style="display: flex; flex-direction: column; gap: 20px;">
@@ -503,7 +498,7 @@ function openCheckoutModal(record) {
       }
 
       // 2. Registrar no Fluxo de Caixa a Receita consolidada
-      const description = `Fechamento Caixa: Consulta + Materiais (Pet: ${pet ? pet.name : 'N/A'})`;
+      const description = `Fechamento Caixa: Consulta + Materiais (Paciente: ${pet ? pet.name : 'N/A'})`;
       const financeTransactionId = await addTenantDoc("finance", {
         type: "income",
         description: description,
@@ -556,9 +551,9 @@ function openCheckoutModal(record) {
 function renderDirectForm() {
   const container = document.getElementById("chk-direct-container");
 
-  let clientOptions = `<option value="" disabled selected>Selecione um tutor...</option>`;
-  clientsList.forEach(c => {
-    clientOptions += `<option value="${c.id}">${c.name} (${c.phone})</option>`;
+  let clientOptions = `<option value="" disabled selected>Selecione o paciente...</option>`;
+  petsList.forEach(p => {
+    clientOptions += `<option value="${p.id}">${p.name} (CPF: ${p.cpf || 'Não Informado'})</option>`;
   });
 
   let inventoryOptions = `<option value="" disabled selected>Selecione um item...</option>`;
@@ -576,7 +571,7 @@ function renderDirectForm() {
         
         <!-- Cliente -->
         <div class="form-group">
-          <label for="direct-client">Cliente (Tutor)</label>
+          <label for="direct-client">Paciente</label>
           <div class="input-wrapper">
             <i data-lucide="user" class="input-icon"></i>
             <select id="direct-client" required style="padding-left: 42px;">
@@ -801,7 +796,7 @@ function renderDirectForm() {
     const clientId = document.getElementById("direct-client").value;
     const paymentMethod = document.getElementById("direct-payment-method").value;
     const paymentDate = document.getElementById("direct-payment-date").value;
-    const clientObj = clientsList.find(c => c.id === clientId);
+    const clientObj = petsList.find(p => p.id === clientId);
 
     if (totalDirect <= 0) {
       showToast("O valor total da venda deve ser maior que zero.", "warning");
@@ -821,7 +816,7 @@ function renderDirectForm() {
       }
 
       // 2. Registrar no Fluxo de Caixa a receita
-      const description = `Venda Direta: ${clientObj ? clientObj.name : 'Cliente'}`;
+      const description = `Venda Direta: ${clientObj ? clientObj.name : 'Paciente'}`;
       await addTenantDoc("finance", {
         type: "income",
         description: description,

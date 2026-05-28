@@ -50,7 +50,7 @@ document.querySelectorAll(".nav-link").forEach(link => {
 const routes = {
   dashboard: { title: "Dashboard", render: renderDashboard, init: initDashboard },
   appointments: { title: "Agenda de Consultas", render: renderAppointmentsView, init: initAppointmentsView },
-  pets: { title: "Clientes & Pets", render: renderPets, init: initPets },
+  pets: { title: "Pacientes", render: renderPets, init: initPets },
   records: { title: "Prontuários Clínicos", render: renderRecords, init: initRecords },
   checkout: { title: "Caixa (PDV)", render: renderCheckout, init: initCheckout },
   inventory: { title: "Gestão de Estoque", render: renderInventory, init: initInventory },
@@ -312,7 +312,7 @@ function formatRole(role) {
     admin: "Administrador",
     vet: "Veterinário",
     staff: "Funcionário",
-    client: "Tutor/Cliente"
+    client: "Paciente/Cliente"
   };
   return roles[role] || role;
 }

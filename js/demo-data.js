@@ -1,53 +1,53 @@
 import { addTenantDoc, setTenantDoc, getTenantDocs, deleteTenantDoc } from "./db.js";
 
 /**
- * Gera massa de dados de exemplo realista para demonstração do sistema VetSaaS.
+ * Gera massa de dados de exemplo realista para demonstração do sistema MedSaaS.
  */
 export async function generateDemoData() {
-  // 1. Cadastrar Fornecedores
+  // 1. Cadastrar Fornecedores de Insumos Médicos
   const supplierId1 = await addTenantDoc("suppliers", {
-    name: "PetDistribuição Ltda",
+    name: "Distribuidora Farmacêutica Brasil Ltda",
     contactName: "João Silva",
     phone: "(11) 98888-1111",
-    email: "contato@petdistribuicao.com",
+    email: "contato@difarmabrasil.com",
     address: "Rua das Flores, 123 - São Paulo - SP"
   });
 
   const supplierId2 = await addTenantDoc("suppliers", {
-    name: "VetDistribuidora S.A.",
+    name: "MedVacinas Distribuidora S.A.",
     contactName: "Mariana Souza",
     phone: "(11) 97777-2222",
-    email: "vendas@vetdistribuidora.com.br",
+    email: "vendas@medvacinas.com.br",
     address: "Av. Industrial, 456 - São Paulo - SP"
   });
 
   // 2. Cadastrar Itens no Estoque (Inventory)
   const itemId1 = await addTenantDoc("inventory", {
-    name: "Vacina V10 Importada",
-    purchasePrice: 35.00,
-    salePrice: 90.00,
+    name: "Vacina Influenza Tripartida",
+    purchasePrice: 25.00,
+    salePrice: 80.00,
     quantity: 15,
     minQuantity: 5,
     unit: "dose",
     supplierId: supplierId2,
-    location: "Geladeira 1"
+    location: "Geladeira de Vacinas 1"
   });
 
   const itemId2 = await addTenantDoc("inventory", {
-    name: "Vacina Antirrábica",
+    name: "Vacina Hepatite B Recombinante",
     purchasePrice: 15.00,
-    salePrice: 45.00,
+    salePrice: 50.00,
     quantity: 20,
     minQuantity: 5,
     unit: "dose",
     supplierId: supplierId2,
-    location: "Geladeira 1"
+    location: "Geladeira de Vacinas 1"
   });
 
   const itemId3 = await addTenantDoc("inventory", {
-    name: "Shampoo Dermatológico 250ml",
-    purchasePrice: 22.00,
-    salePrice: 60.00,
+    name: "Shampoo Cetoconazol 2% 200ml",
+    purchasePrice: 18.00,
+    salePrice: 45.00,
     quantity: 8,
     minQuantity: 3,
     unit: "frasco",
@@ -63,56 +63,33 @@ export async function generateDemoData() {
     minQuantity: 10,
     unit: "bolsa",
     supplierId: supplierId1,
-    location: "Armário Clínico"
+    location: "Armário de Insumos"
   });
 
   const itemId5 = await addTenantDoc("inventory", {
-    name: "Antibiótico Synulox 50mg (10 cpr)",
-    purchasePrice: 45.00,
-    salePrice: 110.00,
+    name: "Amoxicilina + Clavulanato 500mg/125mg (14 cpr)",
+    purchasePrice: 32.00,
+    salePrice: 85.00,
     quantity: 12,
     minQuantity: 4,
     unit: "caixa",
-    supplierId: supplierId2,
-    location: "Armário Clínico"
+    supplierId: supplierId1,
+    location: "Armário de Insumos"
   });
 
-  // 3. Cadastrar Clientes (Tutores)
-  const client1Id = await addTenantDoc("clients", {
-    name: "Carlos Alberto Silva",
-    email: "carlos@exemplo.com",
-    phone: "(11) 98888-7777",
-    cpf: "123.456.789-00",
-    address: "Av. Paulista, 1000 - Bela Vista, São Paulo - SP"
-  });
-
-  const client2Id = await addTenantDoc("clients", {
-    name: "Mariana Medeiros Costa",
-    email: "mariana@exemplo.com",
-    phone: "(11) 97777-6666",
-    cpf: "987.654.321-11",
-    address: "Rua Augusta, 500 - Consolação, São Paulo - SP"
-  });
-
-  const client3Id = await addTenantDoc("clients", {
-    name: "Roberto de Souza",
-    email: "roberto@exemplo.com",
-    phone: "(21) 99999-8888",
-    cpf: "456.789.123-22",
-    address: "Av. Atlântica, 200 - Copacabana, Rio de Janeiro - RJ"
-  });
-
-  // 4. Cadastrar Pets
+  // 3. Cadastrar Pacientes Humanos (na coleção 'pets' para compatibilidade do banco)
   const pet1Id = await addTenantDoc("pets", {
-    name: "Thor",
-    species: "Gato",
-    breed: "Persa",
-    birthDate: "2022-04-12",
-    clientId: client1Id,
-    photoUrl: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&q=80&w=200",
+    name: "Carlos Alberto Silva",
+    birthDate: "1982-04-12",
+    gender: "Masculino",
+    cpf: "123.456.789-00",
+    phone: "(11) 98888-7777",
+    email: "carlos@exemplo.com",
+    allergies: "Nenhuma conhecida",
+    photoUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200",
     vaccines: [
       {
-        name: "Vacina Tríplice Felina",
+        name: "Vacina Influenza Tripartida",
         dateAdministered: "2025-05-10",
         dateExpiration: "2026-05-10",
         status: "applied"
@@ -120,7 +97,7 @@ export async function generateDemoData() {
     ],
     exams: [
       {
-        name: "hemograma_thor.pdf",
+        name: "hemograma_carlos.pdf",
         url: "data:application/pdf;base64,JVBERi0xLjQKJWRlZg==",
         type: "application/pdf",
         date: "2026-03-15T10:00:00.000Z"
@@ -129,38 +106,74 @@ export async function generateDemoData() {
   });
 
   const pet2Id = await addTenantDoc("pets", {
-    name: "Mel",
-    species: "Cão",
-    breed: "Golden Retriever",
-    birthDate: "2020-09-18",
-    clientId: client2Id,
-    photoUrl: "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&q=80&w=200",
+    name: "Mariana Medeiros Costa",
+    birthDate: "1995-09-18",
+    gender: "Feminino",
+    cpf: "987.654.321-11",
+    phone: "(11) 97777-6666",
+    email: "mariana@exemplo.com",
+    allergies: "Alergia a Dipirona",
+    photoUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200",
     vaccines: [
       {
-        name: "Vacina V10",
+        name: "Vacina Influenza Tripartida",
         dateAdministered: "2025-09-18",
         dateExpiration: "2026-09-18",
         status: "applied"
       },
       {
-        name: "Vacina Antirrábica",
+        name: "Vacina Hepatite B Recombinante",
         dateAdministered: "2025-09-18",
-        dateExpiration: "2026-09-18",
+        dateExpiration: "2035-09-18",
         status: "applied"
       }
     ],
     exams: []
   });
 
-  // Criar perfis de vacina públicos correspondentes (para o QR Code)
-  await setTenantDoc("pets", `${pet1Id}/publicProfile/vaccines`, {
-    petName: "Thor",
-    species: "Gato",
-    breed: "Persa",
-    photoUrl: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&q=80&w=200",
+  const pet3Id = await addTenantDoc("pets", {
+    name: "Luna de Souza",
+    birthDate: "2013-01-05",
+    gender: "Feminino",
+    cpf: "456.789.123-22",
+    phone: "(21) 99999-8888",
+    email: "luna@exemplo.com",
+    allergies: "Nenhuma conhecida",
+    photoUrl: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=200",
+    vaccines: [],
+    exams: []
+  });
+
+  const pet4Id = await addTenantDoc("pets", {
+    name: "Fred Ferreira",
+    birthDate: "1988-11-20",
+    gender: "Masculino",
+    cpf: "321.654.987-33",
+    phone: "(11) 96666-5555",
+    email: "fred@exemplo.com",
+    allergies: "Alergia a Penicilina",
+    photoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200",
     vaccines: [
       {
-        name: "Vacina Tríplice Felina",
+        name: "Vacina Hepatite B Recombinante",
+        dateAdministered: "2025-11-20",
+        dateExpiration: "2035-11-20",
+        status: "applied"
+      }
+    ],
+    exams: []
+  });
+
+  // Criar perfis de vacina públicos correspondentes (para o QR Code da Carteira Digital)
+  await setTenantDoc("pets", `${pet1Id}/publicProfile/vaccines`, {
+    petName: "Carlos Alberto Silva",
+    patientName: "Carlos Alberto Silva",
+    cpf: "123.456.789-00",
+    gender: "Masculino",
+    photoUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200",
+    vaccines: [
+      {
+        name: "Vacina Influenza Tripartida",
         dateAdministered: "2025-05-10",
         dateExpiration: "2026-05-10",
         status: "applied"
@@ -169,75 +182,48 @@ export async function generateDemoData() {
   });
 
   await setTenantDoc("pets", `${pet2Id}/publicProfile/vaccines`, {
-    petName: "Mel",
-    species: "Cão",
-    breed: "Golden Retriever",
-    photoUrl: "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&q=80&w=200",
+    petName: "Mariana Medeiros Costa",
+    patientName: "Mariana Medeiros Costa",
+    cpf: "987.654.321-11",
+    gender: "Feminino",
+    photoUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200",
     vaccines: [
       {
-        name: "Vacina V10",
+        name: "Vacina Influenza Tripartida",
         dateAdministered: "2025-09-18",
         dateExpiration: "2026-09-18",
         status: "applied"
       },
       {
-        name: "Vacina Antirrábica",
+        name: "Vacina Hepatite B Recombinante",
         dateAdministered: "2025-09-18",
-        dateExpiration: "2026-09-18",
+        dateExpiration: "2035-09-18",
         status: "applied"
       }
     ]
-  });
-
-  const pet3Id = await addTenantDoc("pets", {
-    name: "Luna",
-    species: "Gato",
-    breed: "SRD",
-    birthDate: "2023-01-05",
-    clientId: client2Id,
-    photoUrl: "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?auto=format&fit=crop&q=80&w=200",
-    vaccines: [],
-    exams: []
-  });
-
-  const pet4Id = await addTenantDoc("pets", {
-    name: "Fred",
-    species: "Cão",
-    breed: "Bulldog Francês",
-    birthDate: "2021-11-20",
-    clientId: client3Id,
-    photoUrl: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=200",
-    vaccines: [
-      {
-        name: "Vacina Antirrábica",
-        dateAdministered: "2025-11-20",
-        dateExpiration: "2026-11-20",
-        status: "applied"
-      }
-    ],
-    exams: []
   });
 
   await setTenantDoc("pets", `${pet4Id}/publicProfile/vaccines`, {
-    petName: "Fred",
-    species: "Cão",
-    breed: "Bulldog Francês",
-    photoUrl: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=200",
+    petName: "Fred Ferreira",
+    patientName: "Fred Ferreira",
+    cpf: "321.654.987-33",
+    gender: "Masculino",
+    photoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200",
     vaccines: [
       {
-        name: "Vacina Antirrábica",
+        name: "Vacina Hepatite B Recombinante",
         dateAdministered: "2025-11-20",
-        dateExpiration: "2026-11-20",
+        dateExpiration: "2035-11-20",
         status: "applied"
       }
     ]
   });
 
-  // 5. Lançar Transações Financeiras Históricas
+  // 4. Lançar Transações Financeiras Históricas
   // Lançar algumas despesas (saídas)
   await addTenantDoc("finance", {
     type: "expense",
-    description: "Pagamento fornecedor - VetDistribuidora (Lote Vacinas)",
+    description: "Pagamento fornecedor - MedVacinas Distribuidora (Lote de Vacinas)",
     amount: 525.00,
     date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
     category: "Estoque",
@@ -246,7 +232,7 @@ export async function generateDemoData() {
 
   await addTenantDoc("finance", {
     type: "expense",
-    description: "Aluguel da sala comercial da clínica",
+    description: "Aluguel do consultório médico",
     amount: 1500.00,
     date: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
     category: "Infraestrutura",
@@ -265,8 +251,8 @@ export async function generateDemoData() {
   // Lançar algumas receitas (entradas)
   const transId1 = await addTenantDoc("finance", {
     type: "income",
-    description: "Consulta e medicação de Thor",
-    amount: 310.00,
+    description: "Consulta médica e antibioticoterapia de Carlos",
+    amount: 235.00,
     date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
     category: "Consultas",
     paymentMethod: "PIX"
@@ -274,8 +260,8 @@ export async function generateDemoData() {
 
   const transId2 = await addTenantDoc("finance", {
     type: "income",
-    description: "Atendimento completo e vacinação da Mel",
-    amount: 200.00,
+    description: "Atendimento preventivo e vacinação de Mariana",
+    amount: 280.00,
     date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
     category: "Consultas",
     paymentMethod: "Dinheiro"
@@ -283,61 +269,61 @@ export async function generateDemoData() {
 
   await addTenantDoc("finance", {
     type: "income",
-    description: "Venda avulsa: Shampoo Dermatológico e Antibiótico",
-    amount: 170.00,
+    description: "Venda avulsa: Shampoo Cetoconazol e Amoxicilina",
+    amount: 130.00,
     date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
     category: "Medicamentos",
     paymentMethod: "Cartão"
   });
 
-  // 6. Cadastrar Prontuários Médicos (Records)
-  // Prontuário 1 (Thor) - Já pago
+  // 5. Cadastrar Prontuários Médicos (Records)
+  // Prontuário 1 (Carlos) - Já pago
   await addTenantDoc("records", {
     petId: pet1Id,
     date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
     soap: {
-      subjective: "Thor foi trazido pelo tutor Carlos com queixa de coceira e secreção marrom no ouvido esquerdo há 3 dias. Tutor relata que ele chacoalha muito a cabeça.",
-      objective: "Frequência cardíaca: 140 bpm, Peso: 4.2kg, Temperatura: 38.6°C. Otoscopia revelou eritema importante no conduto auditivo externo esquerdo e secreção ceruminosa escura.",
-      analysis: "Otite externa bilateral (mais acentuada à esquerda) de provável origem bacteriana ou fúngica secundária.",
-      plan: "Limpeza do conduto com Otoguard e aplicação de Synulox 50mg por via oral de 12 em 12 horas por 7 dias. Retorno em 10 dias."
+      subjective: "Carlos compareceu com queixa de dor intensa e secreção no ouvido esquerdo há 3 dias. Refere prurido ocasional e sensação de ouvido abafado.",
+      objective: "PA: 120/80 mmHg, Peso: 78kg, Temperatura: 37.8°C. Otoscopia revelou hiperemia e edema importantes do conduto auditivo externo esquerdo, com secreção ceruminosa espessa.",
+      analysis: "Otite externa aguda no ouvido esquerdo, provável etiologia bacteriana.",
+      plan: "Limpeza local do conduto e prescrição de Amoxicilina + Clavulanato 500mg de 12h/12h por 7 dias. Retorno se não houver melhora em 5 dias."
     },
     usedItems: [
       {
         itemId: itemId5,
-        name: "Antibiótico Synulox 50mg (10 cpr)",
+        name: "Amoxicilina + Clavulanato 500mg/125mg (14 cpr)",
         quantity: 1,
         unit: "caixa",
-        salePrice: 110.00
+        salePrice: 85.00
       }
     ],
     paymentStatus: "paid",
     financeTransactionId: transId1
   });
 
-  // Prontuário 2 (Mel) - Já pago
+  // Prontuário 2 (Mariana) - Já pago
   await addTenantDoc("records", {
     petId: pet2Id,
     date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
     soap: {
-      subjective: "Mel trazida por Mariana para consulta de rotina, pesagem e reforço anual de vacinas.",
-      objective: "FC: 110 bpm, Peso: 28.5kg, Temp: 38.3°C. Mucosas coradas, linfonodos submandibulares normais. Sem outras alterações no exame físico geral.",
-      analysis: "Animal saudável. Apto para imunização anual.",
-      plan: "Administrada 1 dose de Vacina V10 Importada e 1 dose de Vacina Antirrábica. Tutor orientado a observar possíveis reações alérgicas nas primeiras 24h."
+      subjective: "Mariana compareceu para consulta preventiva de rotina e atualização de imunizações (reforço anual da Influenza e início do esquema de Hepatite B).",
+      objective: "PA: 110/70 mmHg, Peso: 62kg, Temp: 36.5°C. Ritmo cardíaco regular, pulmões limpos. Sem alterações clínicas dignas de nota.",
+      analysis: "Paciente saudável. Apta para imunização.",
+      plan: "Administrada 1 dose de Vacina Influenza Tripartida e 1 dose de Vacina Hepatite B Recombinante. Orientada sobre possíveis reações vacinais leves."
     },
     usedItems: [
       {
         itemId: itemId1,
-        name: "Vacina V10 Importada",
+        name: "Vacina Influenza Tripartida",
         quantity: 1,
         unit: "dose",
-        salePrice: 90.00
+        salePrice: 80.00
       },
       {
         itemId: itemId2,
-        name: "Vacina Antirrábica",
+        name: "Vacina Hepatite B Recombinante",
         quantity: 1,
         unit: "dose",
-        salePrice: 45.00
+        salePrice: 50.00
       }
     ],
     paymentStatus: "paid",
@@ -349,18 +335,18 @@ export async function generateDemoData() {
     petId: pet4Id,
     date: new Date().toISOString(),
     soap: {
-      subjective: "Fred foi trazido por Roberto com queixa de lambedura excessiva nas patas e vermelhidão entre os dígitos. Alimenta-se de ração comercial super premium.",
-      objective: "FC: 120 bpm, Peso: 11.2kg, Temp: 38.5°C. Lesões eritematosas interdigitais com presença de saliva marrom nas 4 patas. Sem sinais de infecção profunda.",
-      analysis: "Dermatite interdigital de contato ou hipersensibilidade alimentar secundária.",
-      plan: "Realizar banhos semanais nas patas com Shampoo Dermatológico. Evitar passeios em gramados úmidos. Limpeza local diária com soro fisiológico. Retornar se não houver melhora."
+      subjective: "Fred compareceu ao consultório relatando lesão avermelhada descamativa e coceira no couro cabeludo há cerca de 1 semana.",
+      objective: "PA: 130/85 mmHg, Peso: 80kg, Temp: 36.6°C. Presença de placas eritemato-descamativas bem delimitadas na região occipital do couro cabeludo.",
+      analysis: "Dermatite seborreica grave ou dermatofitose capilar leve.",
+      plan: "Uso de Shampoo Cetoconazol 2% em banhos capilares 3x por semana. Prescrito soro fisiológico para higienização das crostas. Retorno em 15 dias."
     },
     usedItems: [
       {
         itemId: itemId3,
-        name: "Shampoo Dermatológico 250ml",
+        name: "Shampoo Cetoconazol 2% 200ml",
         quantity: 1,
         unit: "frasco",
-        salePrice: 60.00
+        salePrice: 45.00
       },
       {
         itemId: itemId4,
@@ -373,19 +359,19 @@ export async function generateDemoData() {
     paymentStatus: "pending"
   });
 
-  // 7. Agendamentos Clínicos (Appointments)
+  // 6. Agendamentos Clínicos (Appointments)
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   const tomorrowDateStr = tomorrow.toISOString().split("T")[0];
 
   await addTenantDoc("appointments", {
     petId: pet2Id,
-    clientId: client2Id,
-    date: tomorrowDateStr,
-    time: "10:00",
-    description: "Retorno da Mel - Avaliação pós-vacinal",
-    status: "scheduled",
-    type: "Retorno"
+    clientName: "",
+    petName: "Mariana Medeiros Costa",
+    vetName: "Dr. Roberto Nogueira",
+    date: tomorrowDateStr + "T10:00",
+    description: "Avaliação pós-vacinal",
+    status: "scheduled"
   });
 
   const dayAfter = new Date();
@@ -394,17 +380,17 @@ export async function generateDemoData() {
 
   await addTenantDoc("appointments", {
     petId: pet1Id,
-    clientId: client1Id,
-    date: dayAfterDateStr,
-    time: "14:00",
-    description: "Limpeza de tártaro sob anestesia",
-    status: "scheduled",
-    type: "Cirurgia"
+    clientName: "",
+    petName: "Carlos Alberto Silva",
+    vetName: "Dr. Roberto Nogueira",
+    date: dayAfterDateStr + "T14:00",
+    description: "Retorno da consulta de otite - Avaliação de conduto",
+    status: "scheduled"
   });
 }
 
 /**
- * Limpa todos os dados cadastrados na clínica ativa (tutores, pets, estoque, agendamentos, prontuários, financeiro, fornecedores).
+ * Limpa todos os dados cadastrados na clínica ativa (pacientes, estoque, agendamentos, prontuários, financeiro, fornecedores).
  */
 export async function clearClinicData() {
   const collectionsToClear = [
