@@ -405,7 +405,7 @@ async function handleBackupJSON() {
 
     const backupPayload = {
       backupDate: new Date().toISOString(),
-      system: "VetSaaS SaaS Management",
+      system: "MedSaaS SaaS Management",
       data: {
         clients,
         pets,
@@ -420,7 +420,7 @@ async function handleBackupJSON() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupPayload, null, 2));
     const downloadAnchor = document.createElement("a");
     downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `backup_vet_saas_${Date.now()}.json`);
+    downloadAnchor.setAttribute("download", `backup_med_saas_${Date.now()}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     document.body.removeChild(downloadAnchor);

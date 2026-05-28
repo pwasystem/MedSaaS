@@ -84,7 +84,7 @@ export function renderSettings(container) {
       </div>
       <div style="margin-top: 16px; font-size: 14px; line-height: 1.6; color: var(--color-gray-700);">
         <p style="margin-bottom: 16px;">
-          Use os botões abaixo para popular o VetSaaS com dados fictícios para experimentação ou para realizar uma limpeza completa de todos os dados cadastrados (reset de banco).
+          Use os botões abaixo para popular o MedSaaS com dados fictícios para experimentação ou para realizar uma limpeza completa de todos os dados cadastrados (reset de banco).
         </p>
         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
           <button type="button" id="btn-generate-demo" class="btn btn-primary" style="background-color: var(--brand-primary); border-color: var(--brand-primary);">

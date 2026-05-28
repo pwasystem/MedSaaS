@@ -1,131 +1,18 @@
-rules_version = '2';
+rules_version='2'
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // Funções auxiliares para simplificar regras
-    function isSignedIn() {
-      return request.auth != null;
-    }
-    
-    function getUserData() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
-    }
-    
-    function getClinicId() {
-      return getUserData().clinicId;
-    }
-    
-    function getUserRole() {
-      return getUserData().role;
-    }
-    
-    function isMemberOf(clinicId) {
-      return isSignedIn() && getClinicId() == clinicId;
-    }
-    
-    function hasAnyRole(roles) {
-      return isSignedIn() && (getUserRole() in roles);
-    }
-    
-    function isSuperAdmin() {
-      return isSignedIn() && getUserRole() == 'superadmin';
-    }
-
-    // Regras para Coleção de Usuários
-    match /users/{userId} {
-      // O próprio usuário pode ler seu perfil
-      allow read: if isSignedIn() && request.auth.uid == userId;
-      // Admins e funcionários da mesma clínica podem ler outros perfis da clínica
-      allow read: if isSignedIn() && request.auth.uid != userId && getClinicId() == resource.data.clinicId;
-      
-      // O próprio usuário pode criar seu registro durante o signup, ou administradores da mesma clínica
-      allow create: if isSignedIn() && (request.auth.uid == userId || (getClinicId() == request.resource.data.clinicId && hasAnyRole(['admin'])));
-      
-      // O próprio usuário pode se atualizar
-      allow update: if isSignedIn() && request.auth.uid == userId;
-      // Administradores da mesma clínica podem atualizar outros usuários
-      allow update: if isSignedIn() && request.auth.uid != userId && getClinicId() == resource.data.clinicId && hasAnyRole(['admin']);
-      
-      // Apenas administradores da mesma clínica podem deletar usuários
-      allow delete: if isSignedIn() && 
-        request.auth.uid != userId && 
-        getClinicId() == resource.data.clinicId && 
-        hasAnyRole(['admin']);
-    }
-
-    // Regras de isolamento das Clínicas (Multi-tenancy)
-    match /clinics/{clinicId} {
-      // Qualquer usuário autenticado que pertença à clínica pode lê-la, ou o Super Admin global
-      allow read: if isMemberOf(clinicId) || isSuperAdmin();
-      
-      // Permite criação de clínica durante o onboarding/registro do SaaS
-      allow create: if isSignedIn();
-      
-      // Apenas administradores da própria clínica podem atualizar configurações, ou o Super Admin
-      allow update: if (isMemberOf(clinicId) && hasAnyRole(['admin'])) || isSuperAdmin();
-      
-      // Protege contra deleção acidental de tenant
-      allow delete: if false;
-
-      // Histórico de Recebimentos da plataforma sobre as Clínicas (billing_history)
-      match /billing_history/{billingId} {
-        allow read, write: if isSuperAdmin();
-        allow read: if isMemberOf(clinicId);
-      }
-
-      // Subcoleções sob /clinics/{clinicId}
-      
-      // Clientes da clínica
-      match /clients/{clientId} {
-        allow read: if isMemberOf(clinicId);
-        allow write: if isMemberOf(clinicId) && hasAnyRole(['admin', 'vet', 'staff']);
-      }
-
-      // Pets da clínica
-      match /pets/{petId} {
-        allow read: if isMemberOf(clinicId);
-        allow write: if isMemberOf(clinicId) && hasAnyRole(['admin', 'vet', 'staff']);
-        
-        // Subcoleção de perfil público para carteirinha de vacinação via QR Code
-        match /publicProfile/{document=**} {
-          // Permite leitura pública (sem autenticação) para exibir a carteirinha digital do pet
-          allow read: if true;
-          // Apenas funcionários da clínica podem atualizar
-          allow write: if isMemberOf(clinicId) && hasAnyRole(['admin', 'vet', 'staff']);
-        }
-      }
-
-      // Prontuários Médicos (SOAP) e Timelines
-      match /records/{recordId} {
-        // Clientes podem ler seu próprio histórico se implementado, mas veterinários e admins têm acesso total
-        allow read: if isMemberOf(clinicId);
-        // Apenas veterinários e admins podem adicionar ou alterar registros médicos
-        allow write: if isMemberOf(clinicId) && hasAnyRole(['admin', 'vet']);
-      }
-
-      // Inventário de medicamentos e insumos
-      match /inventory/{itemId} {
-        allow read: if isMemberOf(clinicId);
-        allow write: if isMemberOf(clinicId) && hasAnyRole(['admin', 'vet', 'staff']);
-      }
-
-      // Fornecedores
-      match /suppliers/{supplierId} {
-        allow read: if isMemberOf(clinicId);
-        allow write: if isMemberOf(clinicId) && hasAnyRole(['admin', 'vet', 'staff']);
-      }
-
-      // Transações Financeiras (Fluxo de Caixa e Despesas)
-      match /finance/{transactionId} {
-        // Apenas admins têm acesso a dados financeiros confidenciais da clínica
-        allow read, write: if isMemberOf(clinicId) && hasAnyRole(['admin']);
-      }
-
-      // Agenda de Consultas
-      match /appointments/{appointmentId} {
-        allow read: if isMemberOf(clinicId);
-        allow write: if isMemberOf(clinicId) && hasAnyRole(['admin', 'vet', 'staff']);
-      }
+    match /{document=**} {
+      // This rule allows anyone with your database reference to view, edit,
+      // and delete all data in your database. It is useful for getting
+      // started, but it is configured to expire after 30 days because it
+      // leaves your app open to attackers. At that time, all client
+      // requests to your database will be denied.
+      //
+      // Make sure to write security rules for your app before that time, or
+      // else all client requests to your database will be denied until you
+      // update your rules.
+      allow read, write: if request.time < timestamp.date(2026, 6, 27);
     }
   }
 }

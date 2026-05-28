@@ -16,12 +16,12 @@ if (savedConfig && (savedConfig.includes("DummyKey") || savedConfig.includes("ve
   savedConfig = null;
 }
 const firebaseConfig = savedConfig ? JSON.parse(savedConfig) : {
-  apiKey: "AIzaSyCbDFRdF9TYDTfkFpdhqERk6WGu_4M1RaQ",
-  authDomain: "vetsaas-182392.firebaseapp.com",
-  projectId: "vetsaas-182392",
-  storageBucket: "vetsaas-182392.firebasestorage.app",
-  messagingSenderId: "572281442021",
-  appId: "1:572281442021:web:416e49404f847c89778e0c"
+  apiKey: "AIzaSyCkQRjFS9hZdEtQ2h30Pp6KNEjgsANLBqg",
+  authDomain: "medsaas-182392.firebaseapp.com",
+  projectId: "medsaas-182392",
+  storageBucket: "medsaas-182392.firebasestorage.app",
+  messagingSenderId: "810343104762",
+  appId: "1:810343104762:web:8048f5764dbbbcfd5e0943"
 };
 
 // Inicialização dos Serviços

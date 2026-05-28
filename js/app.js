@@ -223,7 +223,7 @@ async function showAppScreen(user) {
     });
     
     // Ajustar cabeçalho da sidebar
-    document.getElementById("sidebar-clinic-name").textContent = "VetSaaS Admin";
+    document.getElementById("sidebar-clinic-name").textContent = "MedSaaS Admin";
     document.getElementById("sidebar-clinic-logo").classList.add("hidden");
     document.getElementById("sidebar-clinic-default-logo").classList.remove("hidden");
     

@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "vetsaas-182392"
-  }
+    "default": "medsaas-182392"
+  },
+  "targets": {},
+  "etags": {}
 }
